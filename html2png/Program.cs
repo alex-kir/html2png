@@ -97,14 +97,11 @@ namespace html2png
             browser.Size = new Size(o.Width, o.Height);
             browser.Load(o.InputFile);
 
-            //await WaitLoading(browser);
             if (o.DelaySeconds > 0)
             {
                 await Task.Delay(TimeSpan.FromSeconds(o.DelaySeconds));
             }
             await WaitLoading(browser);
-            var zoom = await browser.GetZoomLevelAsync();
-            //browser.SetZoomLevel(0.5);
 
             var screenshot = await browser.ScreenshotAsync();
             screenshot.Save(o.OutputFile);
@@ -112,7 +109,9 @@ namespace html2png
 
         private static async Task WaitLoading(ChromiumWebBrowser browser)
         {
-            await Observable.FromEventPattern<LoadingStateChangedEventArgs>(h => browser.LoadingStateChanged += h, h => browser.LoadingStateChanged -= h)
+            await Observable.FromEventPattern<LoadingStateChangedEventArgs>(
+                h => browser.LoadingStateChanged += h,
+                h => browser.LoadingStateChanged -= h)
                 .Select(it => it.EventArgs.IsLoading)
                 .StartWith(browser.IsLoading)
                 .FirstAsync(it => !it);
