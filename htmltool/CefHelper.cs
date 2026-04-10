@@ -1,11 +1,6 @@
 ﻿using CefSharp;
 using CefSharp.OffScreen;
 
-// https://groups.google.com/g/cefglue/c/mMpJCcftfQU?pli=1
-// https://stackoverflow.com/questions/43461640/wait-for-a-page-to-load-with-cefsharp
-// Release\net9.0-windows\runtimes\win-x64\native\CefSharp.BrowserSubprocess.exe 
-// https://learn.microsoft.com/en-us/dotnet/standard/commandline/get-started-tutorial
-
 namespace htmltool;
 
 static class CefHelper
@@ -26,8 +21,6 @@ static class CefHelper
             CachePath = Path.GetFullPath(cachePath),
             CommandLineArgsDisabled = true,
             MultiThreadedMessageLoop = true,
-            //MultiThreadedMessageLoop = false, // AI: stop open browser window
-            //ExternalMessagePump = false, // AI: stop open browser window
             RemoteDebuggingPort = 0, // 0 - disable debugging
             LogFile = logFilePath,
             LogSeverity = severity,

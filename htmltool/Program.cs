@@ -2,18 +2,12 @@
 using CefSharp.OffScreen;
 using System.CommandLine;
 
-// https://groups.google.com/g/cefglue/c/mMpJCcftfQU?pli=1
-// https://stackoverflow.com/questions/43461640/wait-for-a-page-to-load-with-cefsharp
-
 namespace htmltool;
 
 class Program
 {
     static int Main(string[] args)
     {
-#if DEBUG
-        //args = ["screenshot"];
-#endif
         var o = new Options();
 
         var screenshotCommand = new Command("screenshot", "Render HTML into PNG")

@@ -1,10 +1,5 @@
-﻿//using Microsoft.VisualBasic.FileIO;
-using CefSharp;
+﻿using CefSharp;
 using System.CommandLine;
-//using static System.Windows.Forms.Design.AxImporter;
-
-// https://groups.google.com/g/cefglue/c/mMpJCcftfQU?pli=1
-// https://stackoverflow.com/questions/43461640/wait-for-a-page-to-load-with-cefsharp
 
 namespace htmltool;
 
