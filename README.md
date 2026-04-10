@@ -1,5 +1,6 @@
 # htmltool
 
+```
 Description:
   HTML tool
 
@@ -12,10 +13,11 @@ Options:
 
 Commands:
   screenshot  Render HTML into PNG
-
+```
 
 # htmltool screenshot
 
+```
 Description:
   Render HTML into PNG
 
@@ -34,3 +36,4 @@ Options:
   --cef-log-file <cef-log-file>                                       CEF log file
   --cef-log-level <Default|Disable|Error|Fatal|Info|Verbose|Warning>  CEF log level [default: Default]
   -?, -h, --help                                                      Show help and usage information
+```
