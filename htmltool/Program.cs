@@ -1,0 +1,88 @@
+﻿using CefSharp;
+using CefSharp.OffScreen;
+using System.CommandLine;
+
+// https://groups.google.com/g/cefglue/c/mMpJCcftfQU?pli=1
+// https://stackoverflow.com/questions/43461640/wait-for-a-page-to-load-with-cefsharp
+
+namespace htmltool;
+
+class Program
+{
+    static int Main(string[] args)
+    {
+#if DEBUG
+        //args = ["screenshot"];
+#endif
+        var o = new Options();
+
+        var screenshotCommand = new Command("screenshot", "Render HTML into PNG")
+        {
+            o.interactiveOption,
+
+            o.inputOption,
+            o.outputOption,
+            o.cachePathOption,
+
+            o.widthOption,
+            o.heightOption,
+            o.dpiOption,
+            o.delayOption,
+
+            o.cefLogFileOption,
+            o.cefLogLevelOption,
+        };
+
+        screenshotCommand.SetAction(async parseResult =>
+        {
+            return await OnRenderCommand(new OptionsResult(o, parseResult));
+        });
+
+        var rootCommand = new RootCommand("HTML tool");
+        rootCommand.Add(screenshotCommand);
+
+        ParseResult parseResult = rootCommand.Parse(args);
+        var retval = parseResult.Invoke();
+
+        CefHelper.Shutdown();
+        return retval;
+    }
+
+    static async Task<int> OnRenderCommand(OptionsResult o)
+    {
+        CefHelper.Init(o.CachePath, o.CefLogFile, o.CefLogLevel);
+
+        var address = o.InputUrl;
+        if (o.InteractiveMode)
+        {
+            address = await InteractiveBrowserForm.ShowAsync(o);
+        }
+
+        using var browser = new ChromiumWebBrowser();
+
+        browser.LoadingStateChanged += (s, e) =>
+        {
+            Console.WriteLine($"IsLoading:{browser.IsLoading}");
+        };
+
+        browser.Size = new Size(o.Width, o.Height);
+        browser.Load(address);
+
+        await Utils.WhenInitialized(browser);
+
+        if (o.DelayMilliseconds > 0)
+            await Task.Delay(TimeSpan.FromMilliseconds(o.DelayMilliseconds));
+
+        await Utils.WhenLoadingCompleted(browser);
+
+        // TODO use dpi;
+        var screenshot = await browser.CaptureScreenshotAsync(format: CefSharp.DevTools.Page.CaptureScreenshotFormat.Png);
+        File.WriteAllBytes(o.OutputFile, screenshot);
+
+        browser.Stop();
+        browser.GetBrowser().StopLoad();
+
+        return 0;
+    }
+}
+
