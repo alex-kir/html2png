@@ -12,20 +12,35 @@ static class CefHelper
 
         string basePath = AppDomain.CurrentDomain.BaseDirectory;
         string nativePath = Path.Combine(basePath, "runtimes", "win-x64", "native");
-        
+
         var settings = new CefSettings()
         {
             BrowserSubprocessPath = Path.Combine(nativePath, "CefSharp.BrowserSubprocess.exe"),
             LocalesDirPath = Path.Combine(nativePath, "locales"),
             ResourcesDirPath = nativePath,
             CachePath = Path.GetFullPath(cachePath),
-            CommandLineArgsDisabled = true,
+
+            // This will force CEF to ignore the main .exe's arguments
+            // and use only those specified in CefCommandLineArgs
+            CommandLineArgsDisabled = false,
+
             MultiThreadedMessageLoop = true,
             RemoteDebuggingPort = 0, // 0 - disable debugging
             LogFile = logFilePath,
             LogSeverity = severity,
             PersistSessionCookies = false,
         };
+
+        // Sometimes helps in specific environments
+        settings.CefCommandLineArgs.Add("no-sandbox", "1");
+        // Disable hardware acceleration (critical for stable OSR)
+        settings.CefCommandLineArgs.Add("disable-gpu", "1");
+        settings.CefCommandLineArgs.Add("disable-gpu-compositing", "1");
+        // Force software rendering
+        settings.CefCommandLineArgs.Add("enable-begin-frame-scheduling", "1");
+        // Just in case, disable extensions that can open windows
+        settings.CefCommandLineArgs.Add("disable-extensions", "1");
+
 
         Cef.Initialize(settings);
     }

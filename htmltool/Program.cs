@@ -8,6 +8,8 @@ class Program
 {
     static int Main(string[] args)
     {
+        Console.WriteLine($"ARGS: {string.Join(", ", args.Select(a => $"'{a}'"))}");
+
         var o = new Options();
 
         var screenshotCommand = new Command("screenshot", "Render HTML into PNG")
@@ -52,7 +54,11 @@ class Program
             address = await InteractiveBrowserForm.ShowAsync(o);
         }
 
-        using var browser = new ChromiumWebBrowser();
+        using var browser = new ChromiumWebBrowser
+        {
+            LifeSpanHandler = new CustomLifeSpanHandler(),
+            JsDialogHandler = new CustomJsDialogHandler(),
+        };
 
         browser.LoadingStateChanged += (s, e) =>
         {
@@ -62,12 +68,11 @@ class Program
         browser.Size = new Size(o.Width, o.Height);
         browser.Load(address);
 
-        await Utils.WhenInitialized(browser);
+        //await Utils.WhenInitialized(browser);
+        await Utils.WhenLoadingCompleted(browser);
 
         if (o.DelayMilliseconds > 0)
             await Task.Delay(TimeSpan.FromMilliseconds(o.DelayMilliseconds));
-
-        await Utils.WhenLoadingCompleted(browser);
 
         // TODO use dpi;
         var screenshot = await browser.CaptureScreenshotAsync(format: CefSharp.DevTools.Page.CaptureScreenshotFormat.Png);
