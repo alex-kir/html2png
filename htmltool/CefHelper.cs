@@ -36,10 +36,16 @@ static class CefHelper
         // Disable hardware acceleration (critical for stable OSR)
         settings.CefCommandLineArgs.Add("disable-gpu", "1");
         settings.CefCommandLineArgs.Add("disable-gpu-compositing", "1");
+        settings.CefCommandLineArgs.Add("disable-gpu-sandbox", "1");
+        // Prevent GPU process from creating a visible window (happens in non-interactive sessions like Task Scheduler)
+        settings.CefCommandLineArgs.Add("disable-software-rasterizer", "1");
+        settings.CefCommandLineArgs.Add("in-process-gpu", "1");
         // Force software rendering
         settings.CefCommandLineArgs.Add("enable-begin-frame-scheduling", "1");
         // Just in case, disable extensions that can open windows
         settings.CefCommandLineArgs.Add("disable-extensions", "1");
+        // Run network service in-process to avoid spawning a utility subprocess window
+        settings.CefCommandLineArgs.Add("disable-features", "NetworkService,NetworkServiceInProcess");
 
 
         Cef.Initialize(settings);

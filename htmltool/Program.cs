@@ -10,6 +10,10 @@ class Program
     {
         Console.WriteLine($"ARGS: {string.Join(", ", args.Select(a => $"'{a}'"))}");
 
+        // Safety: if somehow launched as a CEF browser subprocess, exit immediately
+        // if (args.Any(a => a.StartsWith("--type=")))
+        //     return 0;
+
         var o = new Options();
 
         var screenshotCommand = new Command("screenshot", "Render HTML into PNG")
@@ -46,13 +50,15 @@ class Program
 
     static async Task<int> OnRenderCommand(OptionsResult o)
     {
+        using var _ = await Utils.Lock(o.CachePath + ".lock");
+
         CefHelper.Init(o.CachePath, o.CefLogFile, o.CefLogLevel);
 
         var address = o.InputUrl;
-        if (o.InteractiveMode)
-        {
-            address = await InteractiveBrowserForm.ShowAsync(o);
-        }
+        //if (o.InteractiveMode)
+        //{
+        //    address = await InteractiveBrowserForm.ShowAsync(o);
+        //}
 
         using var browser = new ChromiumWebBrowser
         {
