@@ -54,6 +54,11 @@ class Options
         DefaultValueFactory = _ => false
     };
 
+    public readonly Option<string?> xpathOption = new Option<string?>("--xpath")
+    {
+        Description = "XPath of element to capture (full page if not specified)",
+    };
+
     public readonly Option<LogSeverity> cefLogLevelOption = new Option<LogSeverity>("--cef-log-level")
     {
         Description = "CEF log level",

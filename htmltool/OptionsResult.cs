@@ -20,5 +20,7 @@ class OptionsResult(Options options, ParseResult parseResult)
 
     public string? CefLogFile => _parse.GetValue(_opts.cefLogFileOption);
     public LogSeverity CefLogLevel => _parse.GetValue(_opts.cefLogLevelOption);
+
+    public string? XPath => _parse.GetValue(_opts.xpathOption);
 }
 

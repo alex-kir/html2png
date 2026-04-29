@@ -47,7 +47,7 @@ class InteractiveCommand
         {
             var _form = new Form
             {
-                Text = "Browser Preview",
+                Text = "htmltool",
                 Width = o.Width,
                 Height = o.Height,
                 StartPosition = FormStartPosition.CenterScreen,
