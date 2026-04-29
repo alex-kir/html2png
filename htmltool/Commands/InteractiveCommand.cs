@@ -1,11 +1,44 @@
-﻿
 using CefSharp;
 using CefSharp.WinForms;
+using System.CommandLine;
 
 namespace htmltool;
 
-public static class InteractiveBrowserForm
+class InteractiveCommand
 {
+    public static Command Create(Options o)
+    {
+        var command = new Command("interactive", "Open HTML in an interactive browser window")
+        {
+            o.inputOption,
+
+            o.widthOption,
+            o.heightOption,
+
+            o.cachePathOption,
+            o.cefLogFileOption,
+            o.cefLogLevelOption,
+        };
+
+        command.SetAction(async parseResult =>
+        {
+            return await Run(new OptionsResult(o, parseResult));
+        });
+
+        return command;
+    }
+
+    static async Task<int> Run(OptionsResult o)
+    {
+        using var _ = await Utils.Lock(o.CachePath + ".lock");
+
+        CefHelper.Init(o.CachePath, o.CefLogFile, o.CefLogLevel);
+
+        await ShowAsync(o);
+
+        return 0;
+    }
+
     static internal Task<string> ShowAsync(OptionsResult o)
     {
         var _completionSource = new TaskCompletionSource<string>();

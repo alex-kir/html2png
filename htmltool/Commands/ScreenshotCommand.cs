@@ -1,0 +1,71 @@
+using CefSharp;
+using CefSharp.OffScreen;
+using System.CommandLine;
+
+namespace htmltool;
+
+class ScreenshotCommand
+{
+    public static Command Create(Options o)
+    {
+        var command = new Command("screenshot", "Render HTML into PNG")
+        {
+            o.inputOption,
+            o.outputOption,
+            o.cachePathOption,
+
+            o.widthOption,
+            o.heightOption,
+            o.dpiOption,
+            o.delayOption,
+
+            o.cefLogFileOption,
+            o.cefLogLevelOption,
+        };
+
+        command.SetAction(async parseResult =>
+        {
+            return await Run(new OptionsResult(o, parseResult));
+        });
+
+        return command;
+    }
+
+    static async Task<int> Run(OptionsResult o)
+    {
+        using var _ = await Utils.Lock(o.CachePath + ".lock");
+
+        CefHelper.Init(o.CachePath, o.CefLogFile, o.CefLogLevel);
+
+        var address = o.InputUrl;
+
+        using var browser = new ChromiumWebBrowser
+        {
+            LifeSpanHandler = new CustomLifeSpanHandler(),
+            JsDialogHandler = new CustomJsDialogHandler(),
+        };
+
+        browser.LoadingStateChanged += (s, e) =>
+        {
+            Console.WriteLine($"IsLoading:{browser.IsLoading}");
+        };
+
+        browser.Size = new Size(o.Width, o.Height);
+        browser.Load(address);
+
+        //await Utils.WhenInitialized(browser);
+        await Utils.WhenLoadingCompleted(browser);
+
+        if (o.DelayMilliseconds > 0)
+            await Task.Delay(TimeSpan.FromMilliseconds(o.DelayMilliseconds));
+
+        // TODO use dpi;
+        var screenshot = await browser.CaptureScreenshotAsync(format: CefSharp.DevTools.Page.CaptureScreenshotFormat.Png);
+        File.WriteAllBytes(o.OutputFile, screenshot);
+
+        browser.Stop();
+        browser.GetBrowser().StopLoad();
+
+        return 0;
+    }
+}
