@@ -8,8 +8,6 @@ class OptionsResult(Options options, ParseResult parseResult)
     private readonly Options _opts = options;
     private readonly ParseResult _parse = parseResult;
 
-    public bool InteractiveMode => _parse.GetValue(_opts.interactiveOption);
-
     public string InputUrl => _parse.GetValue(_opts.inputOption)!;
     public string OutputFile => _parse.GetValue(_opts.outputOption)!;
     public string CachePath => _parse.GetValue(_opts.cachePathOption)!;

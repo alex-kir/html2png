@@ -48,12 +48,6 @@ class Options
         DefaultValueFactory = _ => 1000,
     };
 
-    public readonly Option<bool> interactiveOption = new Option<bool>("--interactive")
-    {
-        Description = "Interactive mode",
-        DefaultValueFactory = _ => false
-    };
-
     public readonly Option<string?> xpathOption = new Option<string?>("--xpath")
     {
         Description = "XPath of element to capture (full page if not specified)",

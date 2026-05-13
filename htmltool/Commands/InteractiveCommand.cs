@@ -55,22 +55,14 @@ class InteractiveCommand
                 MaximizeBox = true,
                 MinimizeBox = true,
                 ShowInTaskbar = true,
-                TopMost = true
             };
 
             var browser = new ChromiumWebBrowser(o.InputUrl)
             {
                 Dock = DockStyle.Fill,
                 LifeSpanHandler = new CustomLifeSpanHandler(),
+                MenuHandler = new CustomContextMenuHandler(),
             };
-
-            //browser.NewWindow += (sender, e) =>
-            //{
-            //    // Cancel
-            //    e.Handled = true;
-            //    // Load URL in current browser
-            //    browser.Load(e.TargetUrl);
-            //};
 
             _form.Controls.Add(browser);
 
