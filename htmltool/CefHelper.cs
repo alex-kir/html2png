@@ -31,6 +31,9 @@ static class CefHelper
             PersistSessionCookies = false,
         };
 
+        // Force device scale factor to 1 so system DPI does not interfere with
+        // SetDeviceMetricsOverride — important on multi-monitor / high-DPI setups.
+        settings.CefCommandLineArgs.Add("force-device-scale-factor", "1");
         // Sometimes helps in specific environments
         settings.CefCommandLineArgs.Add("no-sandbox", "1");
         // Disable hardware acceleration (critical for stable OSR)

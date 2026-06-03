@@ -51,10 +51,21 @@ class ScreenshotCommand
             Console.WriteLine($"IsLoading:{browser.IsLoading}");
         };
 
-        browser.Size = new Size(o.Width, o.Height);
+        double scaleFactor = o.Dpi / 96.0;
+        browser.Size = new Size((int)(o.Width * scaleFactor), (int)(o.Height * scaleFactor));
+        Console.WriteLine($"o.Dpi:{o.Dpi}    scaleFactor:{scaleFactor}    browser.Size:{browser.Size}");
+
         browser.Load(o.InputUrl);
 
         await Utils.WhenLoadingCompleted(browser);
+
+        browser.SetZoomLevel(0); // 0 = 100% (Chromium stores zoom as ln(factor))
+
+        await browser.GetDevToolsClient().Emulation.SetDeviceMetricsOverrideAsync(
+            width: o.Width,
+            height: o.Height,
+            deviceScaleFactor: scaleFactor,
+            mobile: false);
 
         if (o.DelayMilliseconds > 0)
             await Task.Delay(TimeSpan.FromMilliseconds(o.DelayMilliseconds));
@@ -63,6 +74,8 @@ class ScreenshotCommand
 
         if (o.XPath is not null)
         {
+            await Utils.WhenCanExecuteJavascript(browser);
+
             var xpathJson = JsonSerializer.Serialize(o.XPath);
             var script = $@"(function() {{
                 var el = document.evaluate({xpathJson}, document, null,
@@ -98,7 +111,6 @@ class ScreenshotCommand
         }
         else
         {
-            // TODO use dpi
             screenshot = await browser.CaptureScreenshotAsync(format: CefSharp.DevTools.Page.CaptureScreenshotFormat.Png);
         }
 

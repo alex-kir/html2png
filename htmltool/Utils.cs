@@ -80,24 +80,10 @@ static class Utils
         }
     }
 
-    public static async Task WhenInitialized(CefSharp.OffScreen.ChromiumWebBrowser browser)
+public static async Task WhenCanExecuteJavascript(IWebBrowser browser)
     {
-        browser.FrameLoadStart += (s, aa) =>
-        {
-            Console.WriteLine($"FrameLoadStart: {aa.Frame.IsMain} - {aa.Frame.Name}");
-        };
-
-        browser.FrameLoadEnd += (s, aa) =>
-        {
-            Console.WriteLine($"FrameLoadEnd: {aa.Frame.IsMain} - {aa.Frame.Name}");
-        };
-
-        await Observable.FromEventPattern(
-            h => browser.BrowserInitialized += h,
-            h => browser.BrowserInitialized -= h)
-            .Select(it => browser.IsBrowserInitialized)
-            .StartWith(browser.IsBrowserInitialized)
-            .FirstAsync(it => it);
+        while (!browser.CanExecuteJavascriptInMainFrame)
+            await Task.Delay(50);
     }
 
     public static async Task WhenLoadingCompleted(IRenderWebBrowser browser)

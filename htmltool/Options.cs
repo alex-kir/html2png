@@ -32,8 +32,8 @@ class Options
 
     public readonly Option<int> dpiOption = new Option<int>("--dpi")
     {
-        Description = "Browser window DPI",
-        DefaultValueFactory = _ => 192,
+        Description = "Browser window DPI (96 = 1x, 192 = 2x Retina)",
+        DefaultValueFactory = _ => 96,
     };
 
     public readonly Option<string> cachePathOption = new Option<string>("--cache-path")

@@ -14,6 +14,7 @@ class OptionsResult(Options options, ParseResult parseResult)
 
     public int Width => _parse.GetValue(_opts.widthOption);
     public int Height => _parse.GetValue(_opts.heightOption);
+    public int Dpi => _parse.GetValue(_opts.dpiOption);
     public int DelayMilliseconds => _parse.GetValue(_opts.delayOption);
 
     public string? CefLogFile => _parse.GetValue(_opts.cefLogFileOption);
